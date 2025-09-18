@@ -1,5 +1,5 @@
 #include <iostream>
-#define ARRAY_LENGTH 10000
+#define ARRAY_LENGTH 80000
 
 void bubbleSort(int* arr, size_t len ){
     for (size_t i = 0; i < len - 1 ; ++i) {
@@ -17,10 +17,6 @@ int main() {
     }
 
     bubbleSort(array,ARRAY_LENGTH);
-
-    for (int i : array)
-        std::cout << i << std::endl;
-
-
+        
     return 0;
 }
