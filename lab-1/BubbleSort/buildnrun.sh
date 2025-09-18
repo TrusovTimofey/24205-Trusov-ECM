@@ -1,5 +1,5 @@
 #!/bin/bash
 
-gcc -o BubbleSort main.cpp
-time ./BubbleSort
+g++ main.cpp -o BubbleSort
+./BubbleSort
 echo "готово"
