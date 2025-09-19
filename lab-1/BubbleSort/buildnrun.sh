@@ -1,5 +1,14 @@
 #!/bin/bash
 
-g++ main.cpp -o BubbleSort
-./BubbleSort
+for var in "-O0" "-O1" "-O2" "-O3" "-Os" "-Ofast" "-Og"
+do
+	echo "$var:"
+	g++ main.cpp $var -o BubbleSort -lrt
+	for n in 50000 100000 150000
+	do
+		echo -n "  N=$n: "
+		./BubbleSort $n
+	done
+	echo ""
+done
 echo "готово"
