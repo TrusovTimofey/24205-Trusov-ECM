@@ -1,14 +1,14 @@
 #!/bin/bash
 
-for var in "-O0" "-O1" "-O2" "-O3" "-Os" "-Ofast" "-Og"
+gcc main.c -o BubbleSort -lrt
+
+step=10000
+
+for (( i=1; i<=20; i++))
 do
-	echo "$var:"
-	gcc $var main.c -o BubbleSort -lrt
-	for n in 50000 100000 150000
-	do
-		echo -n "  N=$n: "
-		./BubbleSort $n
-	done
-	echo ""
+    N=$((i * step))
+    echo -n "  N=$N: "
+	./BubbleSort $N
 done
+
 echo "готово"
