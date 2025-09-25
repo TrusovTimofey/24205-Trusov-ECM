@@ -3,7 +3,7 @@
 for var in "-O0" "-O1" "-O2" "-O3" "-Os" "-Ofast" "-Og"
 do
 	echo "$var:"
-	g++ main.cpp $var -o BubbleSort -lrt
+	gcc $var main.c -o BubbleSort -lrt
 	for n in 50000 100000 150000
 	do
 		echo -n "  N=$n: "
