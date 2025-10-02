@@ -40,15 +40,19 @@ int main(int argc, char* argv[]) {
 		array[i] = rand();
 	}
 
-	struct timespec start, end;
+	struct timespec start, end, err;
+    clock_getres(CLOCK_MONOTONIC_RAW, &err);
 	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
 	bubbleSort(array, (size_t)number);
 
 	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    
 
-	double delta = (end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec));
-	printf("%9lfsec, %.15lf%%\n",delta,(1 / (delta * 1000000000)));
+	double delta = end.tv_sec - start.tv_sec + 0.000000001 * (end.tv_nsec - start.tv_nsec);
+
+    
+	printf("%.10lfsec, %.15lf%%\n",delta,(err.tv_nsec / (delta * 1000000000)));
 
 	free(array);
 
