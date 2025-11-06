@@ -149,3 +149,22 @@ void BlackWhite::apply(Image &image) {
         image.at(i).blue() = light;
     }
 }
+
+void SwapColors::apply(Image &image) {
+    if(!isActive()) return;
+    for(int i = 0; i < image.size();++i){
+        ushort red = image.at(i).red();
+        image.at(i).red() = image.at(i).green();
+        image.at(i).green() = image.at(i).blue();
+        image.at(i).blue() = red;
+    }
+}
+
+void Negative::apply(Image &image) {
+    if(!isActive()) return;
+    for(int i = 0; i < image.size();++i){
+        image.at(i).red() = 255 - image.at(i).red();
+        image.at(i).green() = 255 -image.at(i).green();
+        image.at(i).blue() = 255 - image.at(i).blue();
+    }
+}

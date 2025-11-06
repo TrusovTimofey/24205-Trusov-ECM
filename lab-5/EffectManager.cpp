@@ -4,9 +4,11 @@ EffectManager::EffectManager() {
     addEffect('r',std::make_unique<RedFilter>());
     addEffect('g',std::make_unique<GreenFilter>());
     addEffect('b',std::make_unique<BlueFilter>());
-    addEffect('s',std::make_unique<Gradient>());
+    addEffect('d',std::make_unique<Gradient>());
     addEffect('c',std::make_unique<ChromaticAberration>());
     addEffect('w',std::make_unique<BlackWhite>());
+    addEffect('n',std::make_unique<Negative>());
+    addEffect('s',std::make_unique<SwapColors>());
     addEffect('l',std::make_unique<Brightness>());
     addEffect('f',std::make_unique<Flip>());
     addEffect('m',std::make_unique<Mirror>());

@@ -104,3 +104,13 @@ class BlackWhite : public ImageEffect{
 public:
     void apply(Image& image) override;
 };
+
+class SwapColors: public ImageEffect{
+public:
+    void apply(Image& image) override;
+};
+
+class Negative : public ImageEffect{
+public:
+    void apply(Image& image) override;
+};
