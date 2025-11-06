@@ -2,5 +2,6 @@
 .idea/
 # CMake
 cmake-build-*/
+build/
 # Compiled
 *.out
