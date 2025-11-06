@@ -127,3 +127,25 @@ void Trail::switchActive() {
             _havePrev = false;
     }
 }
+
+void Gradient::apply(Image &image) {
+    if(!isActive()) return;
+    for(int x = 0; x < image.width();++x){
+        float normalizedWidth = (float )x / image.width();
+        for (int y = 0; y < image.height(); ++y) {
+            image.at(x,y).red()=(uchar)(normalizedWidth * image.at(x,y).red());
+            image.at(x,y).blue()=(uchar)((1-normalizedWidth) * image.at(x,y).blue());
+        }
+    }
+}
+
+void BlackWhite::apply(Image &image) {
+    if(!isActive()) return;
+    for(int i = 0; i < image.size();++i){
+        int light = image.at(i).red() + image.at(i).blue() + image.at(i).green();
+        light /= 3;
+        image.at(i).red() = light;
+        image.at(i).green() = light;
+        image.at(i).blue() = light;
+    }
+}

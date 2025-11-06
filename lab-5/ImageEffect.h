@@ -18,7 +18,7 @@ class Brightness: public  ImageEffect{
 private:
     float _bright = 1;
     float _step = 0.1;
-    float _max = 2;
+    float _max = 10;
     float _min = 0.1f;
 public:
     void apply(Image& image) override;
@@ -93,4 +93,14 @@ private:
 public:
     void apply(Image& image) override;
     void switchActive() override;
+};
+
+class Gradient : public ImageEffect{
+public:
+    void apply(Image& image) override;
+};
+
+class BlackWhite : public ImageEffect{
+public:
+    void apply(Image& image) override;
 };
