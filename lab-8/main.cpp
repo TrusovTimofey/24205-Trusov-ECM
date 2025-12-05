@@ -18,16 +18,14 @@ uint64_t minTraverseTime(const int* array, size_t size);
 
 int main() {
     const int MIN = 1024 / sizeof(int);
-    const int MAX = 64*1024*1024 / sizeof(int);
+    const int MAX = 32*1024*1024 / sizeof(int);
 
     ofstream out("out.csv");
     out << "N,forward,backward,random\n";
 
     int* array = new int[MAX];
 
-    size_t step = 1;
-
-    for (size_t n = MIN; n < MAX; n += step) {
+    for (size_t n = MIN; n <= MAX; n<<=1) {
         cout << (n / (double)MAX * 100.)  << "%" << endl;
 
         out << (n * 4. / 1024) << ",";
@@ -43,8 +41,6 @@ int main() {
         fillRandom(array, n);
         warmUp(array, n);
         out << (minTraverseTime(array, n)) << "\n";
-
-        step = 1. * n * n / MAX /4 + 1;
     }
 
     delete array;
@@ -92,7 +88,7 @@ uint64_t traverseTicks(const int* array, size_t size) {
 uint64_t minTraverseTime(const int* array, size_t size) {
     uint64_t min = UINT64_MAX;
     for (size_t i = 0; i < 10; ++i) {
-        auto ticks = traverseTicks(array, 10*size);
+        auto ticks = traverseTicks(array, 50*size);
         min = min > ticks ? ticks : min;
     }
     return min;
