@@ -34,15 +34,15 @@ int main() {
 
         fillForward(array, n);
         warmUp(array, n);
-        out << (minTraverseTime(array, n) / n) << ",";
+        out << (minTraverseTime(array, n)) << ",";
         
         fillBackward(array, n);
         warmUp(array, n);
-        out << (minTraverseTime(array, n) / n) << ",";
+        out << (minTraverseTime(array, n)) << ",";
 
         fillRandom(array, n);
         warmUp(array, n);
-        out << (minTraverseTime(array, n) / n) << "\n";
+        out << (minTraverseTime(array, n)) << "\n";
 
         step = 1. * n * n / MAX /4 + 1;
     }
@@ -86,13 +86,13 @@ uint64_t traverseTicks(const int* array, size_t size) {
         k = array[k];
     }
     auto end = getTick();
-    return end - start;
+    return (end - start)/size;
 }
 
 uint64_t minTraverseTime(const int* array, size_t size) {
     uint64_t min = UINT64_MAX;
-    for (size_t i = 0; i < 5; ++i) {
-        auto ticks = traverseTicks(array, size);
+    for (size_t i = 0; i < 10; ++i) {
+        auto ticks = traverseTicks(array, 10*size);
         min = min > ticks ? ticks : min;
     }
     return min;
