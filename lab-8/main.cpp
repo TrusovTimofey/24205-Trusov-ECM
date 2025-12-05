@@ -44,7 +44,7 @@ int main() {
         warmUp(array, n);
         out << (minTraverseTime(array, n) / n) << "\n";
 
-        step = 1. * n * n / MAX + 1;
+        step = 1. * n * n / MAX /4 + 1;
     }
 
     delete array;
