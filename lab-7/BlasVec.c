@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-
+#include <cblas.h>
 
 typedef struct {
     size_t size;
@@ -97,59 +97,45 @@ float normInf(const Matrix* m) {
     return res;
 }
 
-float dotProduct(const float* vec1, const float* vec2, size_t size) {
-    float result = 0.0f;
-    for (size_t i = 0; i < size; ++i) {
-        result += vec1[i] * vec2[i];
-    }
-    return result;
-}
 
 void copyData(const Matrix* from, Matrix* to) {
     memcpy(to->data,from->data,to->size*to->size*sizeof(float));
 }
 
 void add(Matrix* m, const Matrix* operand) {
-    const size_t n = m->size * m->size;
-
-    for (size_t i = 0; i < n; ++i) {
-        m->data[i] += operand->data[i];
-    }
+    cblas_saxpy(m->size * m->size, 1, operand->data, 1, m->data, 1);
 }
 
 void sub(Matrix* m, const Matrix* operand) {
-    const size_t n = m->size * m->size;
-    
-    for (size_t i = 0; i < n; ++i) {
-        m->data[i] -= operand->data[i];
-    }
-}
-
-void mul(Matrix* m, const Matrix* operand) {
-
-    size_t n = m->size;
-    Matrix* temp = newMatrix(n);
-
-    Matrix* trans = newMatrix(n);
-    copyData(operand, trans);
-    transpose(trans);
-
-    for (size_t y = 0; y < n; y++) {
-        for (size_t x = 0; x < n; x++) {
-            *at(temp,x,y) = dotProduct(&m->data[y * n], &trans->data[x * n], n);
-        }
-    }
-    
-    copyData(temp, m);
-    deleteMatrix(temp);
-    deleteMatrix(trans);
+    cblas_saxpy(m->size * m->size, -1, operand->data, 1, m->data, 1);
 }
 
 void mulOn(Matrix* m, float scalar) {
-    const size_t n = m->size*m->size;
-    for (size_t i = 0; i < n; ++i) {
-        m->data[i] *= scalar;
-    }
+    cblas_sscal(m->size * m->size, scalar, m->data, 1);
+}
+
+void mul(Matrix* m, const Matrix* operand) {
+    float* res = malloc(m->size * m->size * sizeof(float));
+
+    cblas_sgemm(
+        CblasRowMajor,
+        CblasNoTrans,
+        CblasNoTrans,
+        m->size,
+        m->size,
+        m->size,
+        1.0f,
+        m->data,
+        m->size,
+        operand->data,
+        m->size,
+        0.0f,
+        res,
+        m->size
+    );
+
+    free(m->data);
+    m->data=res;
 }
 
 void inverse(Matrix* A, size_t approximation) {
@@ -215,7 +201,7 @@ void test(size_t aprox) {
 
 int main(void) {
     //test(1000000);
-
+    
     srand((unsigned int)time(NULL));
     Matrix* m = newMatrix(2048);
     fillRandom(m);

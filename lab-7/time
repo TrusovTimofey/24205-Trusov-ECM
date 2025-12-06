@@ -1,0 +1,13 @@
+NoVec:
+-O0: 186s
+-O3: 48s
+
+HandVec:
+-O0: 84s
+-O3: 12s
+
+blas:
+-O0: 0s
+-O3: 0s
+gcc BlasVec.c -O0 -lblas -llapack -lm
+

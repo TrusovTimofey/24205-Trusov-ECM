@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-
+#include <xmmintrin.h>
 
 typedef struct {
     size_t size;
@@ -98,11 +98,30 @@ float normInf(const Matrix* m) {
 }
 
 float dotProduct(const float* vec1, const float* vec2, size_t size) {
-    float result = 0.0f;
-    for (size_t i = 0; i < size; ++i) {
-        result += vec1[i] * vec2[i];
+    __m128* v1 = (__m128*)vec1;
+    __m128* v2 = (__m128*)vec2;
+    __m128 vRes = _mm_setzero_ps();
+
+    const size_t n = size / sizeof(float);
+    for (size_t i = 0; i < n; ++i) {
+        vRes = _mm_add_ps(vRes, _mm_mul_ps(v1[i], v2[i]));
     }
-    return result;
+
+    float res=0;
+    float* resVec = (float*)&vRes;
+    for (size_t i = 0; i < sizeof(float); i++)
+    {
+        res+=resVec[i];
+    }
+
+    const size_t r = size % sizeof(float);
+    const float* rVec1 = vec1 + n * sizeof(float);
+    const float* rVec2 = vec2 + n * sizeof(float);
+    for (size_t i = 0; i < r; ++i) {
+        res+=rVec1[i] * rVec2[i];
+    }
+    
+    return res;
 }
 
 void copyData(const Matrix* from, Matrix* to) {
@@ -110,18 +129,52 @@ void copyData(const Matrix* from, Matrix* to) {
 }
 
 void add(Matrix* m, const Matrix* operand) {
-    const size_t n = m->size * m->size;
+    const size_t n = m->size * m->size / sizeof(float);
+    __m128* m1 = (__m128*)m->data;
+    __m128* m2 = (__m128*)operand->data;
 
     for (size_t i = 0; i < n; ++i) {
-        m->data[i] += operand->data[i];
+        _mm_storeu_ps((float*)&m1[i], _mm_add_ps(m1[i], m2[i]));
+    }
+
+    const size_t r = m->size * m->size % sizeof(float);
+    float* rData1 = m->data + n * sizeof(float);
+    float* rData2 = operand->data + n * sizeof(float);
+    for (size_t i = 0; i < r; ++i) {
+        rData1[i] += rData2[i];
     }
 }
 
 void sub(Matrix* m, const Matrix* operand) {
-    const size_t n = m->size * m->size;
+    const size_t n = m->size * m->size / sizeof(float);
+    __m128* m1 = (__m128*)m->data;
+    __m128* m2 = (__m128*)operand->data;
+
+    for (size_t i = 0; i < n; ++i) {
+        _mm_storeu_ps((float*)&m1[i], _mm_sub_ps(m1[i], m2[i]));
+    }
+
+    const size_t r = m->size * m->size % sizeof(float);
+    float* rData1 = m->data + n * sizeof(float);
+    float* rData2 = operand->data + n * sizeof(float);
+    for (size_t i = 0; i < r; ++i) {
+        rData1[i] -= rData2[i];
+    }
+}
+
+void mulOn(Matrix* m, float scalar) {
+    const size_t n = m->size * m->size / sizeof(float);
+    __m128* m1 = (__m128*)m->data;
+    __m128 s = _mm_load_ps1(&scalar);
     
     for (size_t i = 0; i < n; ++i) {
-        m->data[i] -= operand->data[i];
+        _mm_storeu_ps((float*)&m1[i], _mm_mul_ps(m1[i], s));
+    }
+    
+    const size_t r = m->size * m->size % sizeof(float);
+    float* rData = m->data + n * sizeof(float);
+    for (size_t i = 0; i < r; ++i) {
+        rData[i] *= scalar;
     }
 }
 
@@ -143,13 +196,6 @@ void mul(Matrix* m, const Matrix* operand) {
     copyData(temp, m);
     deleteMatrix(temp);
     deleteMatrix(trans);
-}
-
-void mulOn(Matrix* m, float scalar) {
-    const size_t n = m->size*m->size;
-    for (size_t i = 0; i < n; ++i) {
-        m->data[i] *= scalar;
-    }
 }
 
 void inverse(Matrix* A, size_t approximation) {
