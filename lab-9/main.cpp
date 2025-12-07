@@ -26,7 +26,6 @@ int main() {
     for (size_t f = 1; f <= maxFragments; ++f) {
         
         auto array = createArrayWithOffset(elements,f,offset);
-        //warmUp(array,elements);
         auto time = minTraverseTime(array, elements);
         out << f << "," << time << "\n";
         
@@ -61,10 +60,6 @@ int* createArrayWithOffset(size_t elements, size_t fragments, size_t offset){
     return arr;
 }
 
-void warmUp(const int* array, size_t size) {
-    for (volatile size_t k = 0, i = 0; i < size; ++i) k = array[k];
-}
-
 uint64_t getTick() {
     unsigned int low, high;
     __asm__ __volatile__("rdtsc" : "=a"(low), "=d"(high));
@@ -82,8 +77,8 @@ uint64_t traverseTicks(const int* array, size_t size) {
 
 uint64_t minTraverseTime(const int* array, size_t size) {
     uint64_t min = UINT64_MAX;
-    for (size_t i = 0; i < 10; ++i) {
-        auto ticks = traverseTicks(array, 50*size);
+    for (size_t i = 0; i < 100; ++i) {
+        auto ticks = traverseTicks(array, 100*size);
         min = min > ticks ? ticks : min;
     }
     return min;
