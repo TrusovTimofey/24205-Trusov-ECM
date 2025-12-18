@@ -260,7 +260,7 @@ void test(size_t aprox) {
 }
 
 int main(void) {
-    //test(1000000);
+    test(1000000);
 
     srand((unsigned int)time(NULL));
     Matrix* m = newMatrix(2048);

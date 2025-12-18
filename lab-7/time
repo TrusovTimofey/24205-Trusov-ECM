@@ -1,13 +1,30 @@
+==============================================
 NoVec:
--O0: 186s
--O3: 48s
+    -O0 : 187 s
+    -O0 -march=native: 186 s
+    -O0 -funroll-loops: 186 s
+    -O0 -ffast-math: 185 s
+    O0 -march=native -funroll-loops -ffast-math: 185 s
 
+    -O3 : 47 s
+    -O3 -march=native: 46 s
+    -O3 -funroll-loops: 46 s
+    -O3 -ffast-math: 15 s
+    -O3 -march=native -funroll-loops -ffast-math: 9 s
+
+    -Ofast : 15 s
+    -Ofast -march=native: 11 s
+    -Ofast -funroll-loops: 14 s
+    -Ofast -march=native -funroll-loops: 9 s
+
+==============================================
 HandVec:
--O0: 84s
--O3: 12s
+    -O0: 84s
+    -O3: 12s
 
-blas:
--O0: 0s
--O3: 0s
-gcc BlasVec.c -O0 -lblas -llapack -lm
+==============================================
+BLAS:
+    -O0: 0s
+    -O3: 0s
+==============================================
 

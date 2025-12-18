@@ -4,82 +4,74 @@
 
 using namespace std;
 
-int* createArrayWithOffset(size_t elements, size_t fragments, size_t offset);
-
-void warmUp(const int* array, size_t size);
-
-uint64_t getTick();
-uint64_t traverseTicks(const int* array, size_t size);
-uint64_t minTraverseTime(const int* array, size_t size);
-
-int main() {
-    std::ofstream out("out.csv");
-    out << "fragments,ticks/element\n"; 
-
-    size_t offset = 1;
-    offset <<= 25;
-
-    size_t L1d = 48 * 1024; // 48КБ
-    size_t elements = L1d / sizeof(int) / 2;
-
-    size_t maxFragments = 32;
-    for (size_t f = 1; f <= maxFragments; ++f) {
-        
-        auto array = createArrayWithOffset(elements,f,offset);
-        auto time = minTraverseTime(array, elements);
-        out << f << "," << time << "\n";
-        
-        delete array;
-
-        cout << f*100./maxFragments << "%" << endl;
-    }
-
-    return 0;
-}
-
-int* createArrayWithOffset(size_t elements, size_t fragments, size_t offset){
+unsigned int* createArrayWithOffset(unsigned int elements, unsigned int fragments, unsigned int offset){
     elements/=fragments;
-    int* arr = new int[offset*fragments];
+    unsigned int* arr = new unsigned int[offset*fragments];
 
     fragments--;
 
-    for (size_t f = 0; f < fragments; f++)
+    for (unsigned int f = 0; f < fragments; f++)
     {
-        for (size_t i = 0; i < elements; i++)
+        for (unsigned int i = 0; i < elements; i++)
         {
-            arr[offset*f + i] = offset*f + i + offset;
+            arr[offset*f + i] = offset*(f+1) + i;
         }
         
     }
 
-    for (size_t i = 0; i < elements; i++)
+    elements--;
+    for (unsigned int i = 0; i < elements; i++)
     {
-        arr[offset*fragments + i-1] = i;
+        arr[offset*fragments + i] = i+1;
     }
 
     return arr;
 }
 
-uint64_t getTick() {
+unsigned long long getTick() {
     unsigned int low, high;
     __asm__ __volatile__("rdtsc" : "=a"(low), "=d"(high));
     return (static_cast<unsigned long long>(high) << 32) | low;
 }
 
-uint64_t traverseTicks(const int* array, size_t size) {
+unsigned long long traverseTicks(const unsigned int* array, unsigned int size) {
     auto start = getTick();
-    for (volatile size_t k = 0, i = 0; i < size; ++i) {
+    for (volatile unsigned int k = 0, i = 0; i < size; ++i) {
         k = array[k];
     }
     auto end = getTick();
     return (end - start)/size;
 }
 
-uint64_t minTraverseTime(const int* array, size_t size) {
-    uint64_t min = UINT64_MAX;
-    for (size_t i = 0; i < 100; ++i) {
-        auto ticks = traverseTicks(array, 100*size);
+unsigned long long minTraverseTime(const unsigned int* array, unsigned int size) {
+    unsigned long long min = ~((unsigned long long)0);
+    for (unsigned int i = 0; i < 100; ++i) {
+        auto ticks = traverseTicks(array, 1000*size);
         min = min > ticks ? ticks : min;
     }
     return min;
+}
+
+int main() {
+    std::ofstream out("out.csv");
+    out << "fragments,ticks/element\n"; 
+
+    const unsigned int offset = 45 << 21;
+    const unsigned int L1d = 48 * 1024; // 48КБ
+    const unsigned int elements = L1d / sizeof(unsigned int);
+    const unsigned int maxFragments = 32;
+
+    for (unsigned int fragments = 1; fragments <= maxFragments; ++fragments) {
+        
+        auto array = createArrayWithOffset(elements,fragments,offset);
+
+        auto time = minTraverseTime(array, elements);
+        out << fragments << "," << time << "\n";
+        
+        delete array;
+
+        cout << (fragments * 100. / maxFragments) << "%" << endl;
+    }
+
+    return 0;
 }
